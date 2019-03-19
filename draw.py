@@ -1,5 +1,6 @@
 from display import *
 from matrix import *
+import copy
 
   # ====================
   # add the points for a rectagular prism whose 
@@ -8,26 +9,38 @@ from matrix import *
   # ====================
 def add_box( points, x, y, z, width, height, depth ):
 	add_edge(points,	x,			y,			z,			x+width,	y,			z)
-	add_edge(points,	x,			y,			z,			x,			y+height,	z)
-	add_edge(points,	x,			y,			z,			x,			y,			z+depth)
-	add_edge(points,	x,			y,			z+depth,	x+width,	y,			z+depth)
-	add_edge(points,	x+width,	y,			z,			x+width,	y+height,	z)
-	add_edge(points,	x,			y+height,	z,			x,			y+height,	z+depth)
-	add_edge(points,	x+width,	y,			z,			x+width,	y,			z+depth)
-	add_edge(points,	x,			y+height,	z,			x+width,	y+height,	z)
-	add_edge(points,	x,			y,			z+depth,	x,			y+height,	z+depth)
-	add_edge(points,	x+width,	y+height,	z+depth,	x+width,	y,			z+depth)
-	add_edge(points,	x+width,	y+height,	z+depth,	x+width,	y+height,	z)
-	add_edge(points,	x+width,	y+height,	z+depth,	x,			y+height,	z+depth)
+	add_edge(points,	x,			y,			z,			x,			y-height,	z)
+	add_edge(points,	x,			y,			z,			x,			y,			z-depth)
+	add_edge(points,	x,			y,			z-depth,	x+width,	y,			z-depth)
+	add_edge(points,	x+width,	y,			z,			x+width,	y-height,	z)
+	add_edge(points,	x,			y-height,	z,			x,			y-height,	z-depth)
+	add_edge(points,	x+width,	y,			z,			x+width,	y,			z-depth)
+	add_edge(points,	x,			y-height,	z,			x+width,	y-height,	z)
+	add_edge(points,	x,			y,			z-depth,	x,			y-height,	z-depth)
+	add_edge(points,	x+width,	y-height,	z-depth,	x+width,	y,			z-depth)
+	add_edge(points,	x+width,	y-height,	z-depth,	x+width,	y-height,	z)
+	add_edge(points,	x+width,	y-height,	z-depth,	x,			y-height,	z-depth)
   # ====================
   # Generates all the points along the surface
   # of a sphere with center (cx, cy, cz) and
   # radius r.
   # Returns a matrix of those points
   # ====================
-def generate_sphere( points, cx, cy, cz, r, step ):
-    
-
+def generate_sphere( cx, cy, cz, r, step ):
+    n=int(1/step)
+    semicircle=new_matrix(4,0)
+    m=int(n/2)
+    for i in range(m+1):
+    	x = cx + r * math.cos(math.pi*i/m)
+    	y = cy + r * math.sin(math.pi*i/m)
+    	z = cz
+    	add_point(semicircle,x,y,z)
+    sphere=new_matrix(4,0)
+    rot = make_rotX(2*math.pi/n)
+    for i in range(n):
+    	sphere = sphere + copy.deepcopy(semicircle)
+    	matrix_mult(rot,semicircle)
+    return sphere
 
   # ====================
   # adds all the points for a sphere with center 
@@ -36,7 +49,9 @@ def generate_sphere( points, cx, cy, cz, r, step ):
   # necessary points
   # ====================
 def add_sphere( points, cx, cy, cz, r, step ):
-    pass
+    to_add=generate_sphere(cx,cy,cz,r,step);
+    for point in to_add:
+    	add_edge(points,point[0],point[1],point[2],point[0],point[1],point[2])
 
 
   # ====================
@@ -45,8 +60,20 @@ def add_sphere( points, cx, cy, cz, r, step ):
   # radii r0 and r1.
   # Returns a matrix of those points
   # ====================
-def generate_torus( points, cx, cy, cz, r0, r1, step ):
-    pass
+def generate_torus( cx, cy, cz, r0, r1, step ):
+    n=int(1/step)
+    circle=new_matrix(4,0)
+    for i in range(n):
+    	x = r1 + cx + r0 * math.cos(2*math.pi*i/n)
+    	y = cy + r0 * math.sin(2*math.pi*i/n)
+    	z = cz
+    	add_point(circle,x,y,z)
+    torus=new_matrix(4,0)
+    rot = make_rotY(2*math.pi/n)
+    for i in range(n):
+    	torus = torus + copy.deepcopy(circle)
+    	matrix_mult(rot,circle)
+    return torus
 
   # ====================
   # adds all the points for a torus with center
@@ -55,7 +82,9 @@ def generate_torus( points, cx, cy, cz, r0, r1, step ):
   # necessary points
   # ====================
 def add_torus( points, cx, cy, cz, r0, r1, step ):
-    pass
+    to_add=generate_torus(cx,cy,cz,r0,r1,step);
+    for point in to_add:
+    	add_edge(points,point[0],point[1],point[2],point[0],point[1],point[2])
 
 
 

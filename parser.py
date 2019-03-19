@@ -65,6 +65,9 @@ def parse_file( fname, edges, transform, screen, color ):
             c+= 1
             args = lines[c].strip().split(' ')
 
+        if line == 'clear':
+        	edges = edges[:0]
+
         if line == 'circle':
             #print 'CIRCLE\t' + str(args)
             add_circle(edges,
